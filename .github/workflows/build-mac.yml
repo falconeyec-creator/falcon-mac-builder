@@ -1,0 +1,98 @@
+name: Build macOS VST Installer
+
+on:
+  push:
+    paths:
+      - 'plugin/**'
+      - '.github/workflows/build-mac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - name: Checkout Builder
+        uses: actions/checkout@v4
+
+      - name: Verify Plugin Source
+        run: |
+          if [ ! -d "plugin" ] || [ ! -f "plugin/CMakeLists.txt" ]; then
+            echo "Error: No plugin source found in plugin/ folder."
+            exit 1
+          fi
+
+      - name: Setup JUCE (8.0.14)
+        run: |
+          git clone --depth 1 --branch 8.0.14 https://github.com/juce-framework/JUCE.git JUCE-checkout
+
+      - name: Configure CMake
+        run: |
+          cmake -S plugin -B build -G Xcode \
+            -DJUCE_DIR="${{ github.workspace }}/JUCE-checkout" \
+            -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0"
+
+      - name: Build Universal Binary (Release)
+        run: |
+          cmake --build build --config Release -- -quiet
+
+      - name: Package macOS Installer (.pkg)
+        run: |
+          set -e
+          mkdir -p out
+          VST3_PATH=$(find build -type d -name "*.vst3" | head -n1)
+          if [ -z "$VST3_PATH" ]; then
+            echo "Error: No .vst3 produced during build!"
+            exit 1
+          fi
+
+          PROJECT="$(basename "$VST3_PATH" .vst3)"
+          echo "Packaging project: $PROJECT"
+
+          # Ad-hoc sign for Apple Silicon M1/M2/M3/M4 compatibility
+          codesign --force --deep --sign - "$VST3_PATH" || true
+
+          # Build VST3 Component PKG
+          rm -rf pkgroot
+          mkdir -p "pkgroot/vst3/Library/Audio/Plug-Ins/VST3"
+          cp -R "$VST3_PATH" "pkgroot/vst3/Library/Audio/Plug-Ins/VST3/"
+          pkgbuild --root pkgroot/vst3 --identifier "com.falconeye.${PROJECT}.vst3" \
+            --version 1.0.0 --install-location / vst3-component.pkg
+          COMPONENTS=(--package vst3-component.pkg)
+
+          # Standalone App Component PKG (if present)
+          APP_PATH=$(find build -type d -name "*.app" -path "*Standalone*" | head -n1)
+          if [ -n "$APP_PATH" ]; then
+            echo "Found Standalone App: $APP_PATH"
+            codesign --force --deep --sign - "$APP_PATH" || true
+            mkdir -p "pkgroot/app/Applications"
+            cp -R "$APP_PATH" "pkgroot/app/Applications/"
+            pkgbuild --root pkgroot/app --identifier "com.falconeye.${PROJECT}.app" \
+              --version 1.0.0 --install-location / app-component.pkg
+            COMPONENTS+=(--package app-component.pkg)
+          fi
+
+          # Final macOS .pkg Product Installer
+          productbuild "${COMPONENTS[@]}" "out/${PROJECT} Setup.pkg"
+          ls -la out
+
+      - name: Upload Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mac-installer
+          path: out/*.pkg
+          if-no-files-found: error
+
+      - name: Publish Release Asset
+        uses: softprops/action-gh-release@v2
+        if: always()
+        with:
+          tag_name: latest
+          name: "Latest macOS VST Installer"
+          files: out/*.pkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
