@@ -1,6 +1,6 @@
 #include "PluginEditor.h"
 
-FalconDelayEditor::FalconDelayEditor (FalconDelayProcessor& p)
+FalconEcho2026Editor::FalconEcho2026Editor (FalconEcho2026Processor& p)
     : AudioProcessorEditor (p), processor (p)
 {
     setLookAndFeel (&lnf);
@@ -46,12 +46,12 @@ FalconDelayEditor::FalconDelayEditor (FalconDelayProcessor& p)
     startTimerHz (30);
 }
 
-FalconDelayEditor::~FalconDelayEditor()
+FalconEcho2026Editor::~FalconEcho2026Editor()
 {
     setLookAndFeel (nullptr);
 }
 
-void FalconDelayEditor::setupKnob (juce::Slider& slider, const juce::String& paramID)
+void FalconEcho2026Editor::setupKnob (juce::Slider& slider, const juce::String& paramID)
 {
     slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 82, 18);
@@ -60,7 +60,7 @@ void FalconDelayEditor::setupKnob (juce::Slider& slider, const juce::String& par
         std::make_unique<SliderAttachment> (processor.apvts, paramID, slider));
 }
 
-void FalconDelayEditor::paint (juce::Graphics& g)
+void FalconEcho2026Editor::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
 
@@ -80,12 +80,12 @@ void FalconDelayEditor::paint (juce::Graphics& g)
     // Title + brand (two-tone split of the product name)
     juce::Font titleFont (juce::FontOptions (26.0f, juce::Font::bold));
     g.setFont (titleFont);
-    const juce::String titleLeft ("FALCON"), titleRight ("DELAY");
+    const juce::String titleLeft ("FALCON"), titleRight ("ECHO 2026");
     const int titleLeftW = juce::roundToInt (
         juce::GlyphArrangement::getStringWidth (titleFont, titleLeft));
-    g.setColour (falcon::textBright);
+    g.setColour (falcon::titleLeft);
     g.drawText (titleLeft, 24, 16, titleLeftW + 4, 30, juce::Justification::centredLeft);
-    g.setColour (falcon::accent);
+    g.setColour (falcon::titleRight);
     g.drawText (titleRight, 24 + titleLeftW + 10, 16, getWidth() - titleLeftW - 44, 30,
                 juce::Justification::centredLeft);
 
@@ -129,7 +129,7 @@ void FalconDelayEditor::paint (juce::Graphics& g)
     g.drawText ("v1.0.0", 24, getHeight() - 24, 60, 14, juce::Justification::centredLeft);
 }
 
-void FalconDelayEditor::resized()
+void FalconEcho2026Editor::resized()
 {
     const int knobY = 100;
     const int knobH = 150;
@@ -159,7 +159,7 @@ void FalconDelayEditor::resized()
         activation->setBounds (getLocalBounds());
 }
 
-void FalconDelayEditor::timerCallback()
+void FalconEcho2026Editor::timerCallback()
 {
     // Pull peaks from the audio thread, apply GUI-side decay
     const float newL = processor.peakL.exchange (0.0f);

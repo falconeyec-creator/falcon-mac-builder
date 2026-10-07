@@ -53,12 +53,12 @@ private:
     float levelL = 0.0f, levelR = 0.0f;
 };
 
-class FalconDelayEditor : public juce::AudioProcessorEditor,
+class FalconEcho2026Editor : public juce::AudioProcessorEditor,
                           private juce::Timer
 {
 public:
-    explicit FalconDelayEditor (FalconDelayProcessor&);
-    ~FalconDelayEditor() override;
+    explicit FalconEcho2026Editor (FalconEcho2026Processor&);
+    ~FalconEcho2026Editor() override;
 
     void paint (juce::Graphics&) override;
     void resized() override;
@@ -67,7 +67,7 @@ private:
     void timerCallback() override;
     void setupKnob (juce::Slider&, const juce::String& paramID);
 
-    FalconDelayProcessor& processor;
+    FalconEcho2026Processor& processor;
     FalconLookAndFeel lnf;
 
     juce::Slider timeSlider, feedbackSlider, lowCutSlider, highCutSlider, mixSlider, outputSlider;
@@ -94,5 +94,5 @@ private:
 
     juce::Rectangle<int> timeCell; // shared cell for time knob / division combo
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FalconDelayEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FalconEcho2026Editor)
 };

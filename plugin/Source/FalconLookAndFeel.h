@@ -21,6 +21,11 @@ namespace falcon
     const juce::Colour accentHot    { 0xffff7847 };
     const juce::Colour textBright   { 0xffe8ecf4 };
     const juce::Colour textDim      { 0xff7a8699 };
+    // Independent colours for the two-tone product-name title (first word /
+    // rest of the name) — set separately from accent/textBright so the Maker
+    // can offer dedicated "Title left"/"Title right" pickers.
+    const juce::Colour titleLeft    { 0xffe8ecf4 };
+    const juce::Colour titleRight   { 0xffffb13b };
     const juce::Colour trackDark    { 0xff23272f };
 
     //==========================================================================
@@ -150,16 +155,24 @@ namespace falcon
     }
 
     //==========================================================================
-    inline void paintBackground (juce::Graphics& g, juce::Rectangle<float> bounds, float phase)
+    // `imageOverride` lets a template swap in a DIFFERENT custom image than
+    // the plugin-wide one (e.g. Drum Ensemble / Falcon Morph's independent
+    // FX-tab background) without touching this shared function's normal
+    // behaviour for every other template — pass nullptr (the default) to
+    // keep using the regular hasCustomBg()/customBgImage() image.
+    inline void paintBackground (juce::Graphics& g, juce::Rectangle<float> bounds, float phase,
+                                 const juce::Image* imageOverride = nullptr)
     {
         const auto& spec = bgSpec();
         const float w = bounds.getWidth(), h = bounds.getHeight();
 
+        const bool useOverride = imageOverride != nullptr && imageOverride->isValid();
+
         // ---- Base fill: a user-supplied image wins over the preset base fill
         //      (pattern/animation layers below still render on top of it)
-        if (hasCustomBg())
+        if (useOverride || hasCustomBg())
         {
-            auto& img = customBgImage();
+            auto& img = useOverride ? *imageOverride : customBgImage();
             const float ir = (float) img.getWidth() / (float) juce::jmax (1, img.getHeight());
             const float br = w / juce::jmax (1.0f, h);
             juce::Rectangle<float> dest;
