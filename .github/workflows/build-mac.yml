@@ -53,31 +53,46 @@ jobs:
           PROJECT="$(basename "$VST3_PATH" .vst3)"
           echo "Packaging project: $PROJECT"
 
-          # Ad-hoc sign for Apple Silicon M1/M2/M3/M4 compatibility
+          # Clean identifier (NO SPACES, alphanumeric only - prevents Installer JavaScriptError)
+          SAFE_ID=$(echo "$PROJECT" | tr -dc '[:alnum:]' | tr '[:upper:]' '[:lower:]')
+          if [ -z "$SAFE_ID" ]; then SAFE_ID="plugin"; fi
+          PKG_ID="com.falconeye.${SAFE_ID}.pkg"
+          echo "Using sanitized package identifier: $PKG_ID"
+
+          # Ad-hoc sign binaries for Apple Silicon M1/M2/M3/M4 kernel compatibility
           codesign --force --deep --sign - "$VST3_PATH" || true
 
-          # Build VST3 Component PKG
-          rm -rf pkgroot
-          mkdir -p "pkgroot/vst3/Library/Audio/Plug-Ins/VST3"
-          cp -R "$VST3_PATH" "pkgroot/vst3/Library/Audio/Plug-Ins/VST3/"
-          pkgbuild --root pkgroot/vst3 --identifier "com.falconeye.${PROJECT}.vst3" \
-            --version 1.0.0 --install-location / vst3-component.pkg
-          COMPONENTS=(--package vst3-component.pkg)
-
-          # Standalone App Component PKG (if present)
           APP_PATH=$(find build -type d -name "*.app" -path "*Standalone*" | head -n1)
           if [ -n "$APP_PATH" ]; then
             echo "Found Standalone App: $APP_PATH"
             codesign --force --deep --sign - "$APP_PATH" || true
-            mkdir -p "pkgroot/app/Applications"
-            cp -R "$APP_PATH" "pkgroot/app/Applications/"
-            pkgbuild --root pkgroot/app --identifier "com.falconeye.${PROJECT}.app" \
-              --version 1.0.0 --install-location / app-component.pkg
-            COMPONENTS+=(--package app-component.pkg)
           fi
 
-          # Final macOS .pkg Product Installer
-          productbuild "${COMPONENTS[@]}" "out/${PROJECT} Setup.pkg"
+          # Prepare unified installation payload root
+          rm -rf pkgroot
+          mkdir -p "pkgroot/Library/Audio/Plug-Ins/VST3"
+          cp -R "$VST3_PATH" "pkgroot/Library/Audio/Plug-Ins/VST3/"
+
+          if [ -n "$APP_PATH" ]; then
+            mkdir -p "pkgroot/Applications"
+            cp -R "$APP_PATH" "pkgroot/Applications/"
+          fi
+
+          # Generate component plist and disable bundle relocation
+          # (Prevents Spotlight bundle search failures during installation)
+          pkgbuild --analyze --root pkgroot component.plist
+          sed -i '' 's/<true\/>/<false\/>/g' component.plist || true
+
+          # Build atomic component package with clean identifier and no relocation
+          pkgbuild --root pkgroot \
+            --component-plist component.plist \
+            --identifier "$PKG_ID" \
+            --version 1.0.0 \
+            --install-location / \
+            component.pkg
+
+          # Build final macOS product installer
+          productbuild --package component.pkg "out/${PROJECT} Setup.pkg"
           ls -la out
 
       - name: Upload Installer Artifact
