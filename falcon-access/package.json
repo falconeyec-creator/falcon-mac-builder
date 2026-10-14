@@ -1,0 +1,50 @@
+{
+  "name": "falcon-access",
+  "version": "1.0.0",
+  "description": "Falcon Eye Corporation — Falcon Access (install, activate & update center)",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win",
+    "dist:mac": "electron-builder --mac"
+  },
+  "author": "Falcon Eye Corporation",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.falconeyesl.falconaccess",
+    "productName": "Falcon Access",
+    "asar": true,
+    "directories": { "output": "dist" },
+    "files": [ "main.js", "preload.js", "renderer/**/*" ],
+    "win": {
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false,
+      "target": [ { "target": "nsis", "arch": [ "x64" ] } ]
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "category": "public.app-category.music",
+      "target": [ { "target": "pkg", "arch": [ "universal" ] } ],
+      "identity": null
+    },
+    "pkg": {
+      "installLocation": "/Applications",
+      "allowAnywhere": false,
+      "allowCurrentUserHome": false,
+      "isRelocatable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Falcon Access"
+    }
+  }
+}

@@ -1,0 +1,1856 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Falcon Access — Audio Product Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #07090e;
+  --bg-surface: #0c1017;
+  --bg-card: rgba(16, 22, 33, 0.85);
+  --bg-card-hover: rgba(22, 30, 46, 0.95);
+  --bg-input: #090d14;
+  --line-subtle: rgba(255, 255, 255, 0.07);
+  --line-hover: rgba(245, 179, 1, 0.35);
+  --line-focus: #f5b301;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --gold: #f5b301;
+  --gold-dark: #d99b00;
+  --orange: #ff7a00;
+  --grad-gold: linear-gradient(135deg, #f5b301 0%, #ff7a00 50%, #ff5500 100%);
+  --grad-gold-soft: linear-gradient(135deg, rgba(245,179,1,0.18), rgba(255,122,0,0.08));
+  --grad-cyan: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+  --green: #10b981;
+  --green-glow: rgba(16, 185, 129, 0.22);
+  --red: #ef4444;
+  --red-glow: rgba(239, 68, 68, 0.2);
+  --cyan: #06b6d4;
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 16px 36px -10px rgba(0, 0, 0, 0.65), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+  --shadow-hover: 0 20px 48px -8px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 179, 1, 0.15);
+  --font-main: 'Plus Jakarta Sans', 'Segoe UI', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Ambient Animated Studio Background */
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  opacity: 0.16;
+  animation: floatOrb 22s ease-in-out infinite alternate;
+}
+.orb-1 {
+  width: 580px; height: 580px;
+  background: radial-gradient(circle, #f5b301, #ff7a00);
+  top: -150px; left: -100px;
+}
+.orb-2 {
+  width: 650px; height: 650px;
+  background: radial-gradient(circle, #06b6d4, #3b82f6);
+  bottom: -200px; right: -150px;
+  animation-duration: 28s;
+  animation-delay: -6s;
+  opacity: 0.11;
+}
+.orb-3 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, #ff5500, #9333ea);
+  top: 40%; left: 45%;
+  animation-duration: 32s;
+  animation-delay: -12s;
+  opacity: 0.08;
+}
+.ambient-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, 40px) scale(1.1); }
+  100% { transform: translate(-40px, 70px) scale(0.95); }
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.96) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes glowPulse {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(245, 179, 1, 0.4)); }
+  50% { filter: drop-shadow(0 0 22px rgba(245, 179, 1, 0.8)); }
+}
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes waveBars {
+  0%, 100% { height: 6px; }
+  50% { height: 26px; }
+}
+
+/* Typography & General */
+button { font-family: inherit; }
+a { color: var(--gold); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+a:hover { color: #ffd15c; text-decoration: underline; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
+}
+
+/* Base Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--grad-gold);
+  color: #0c0f17;
+  font-weight: 700;
+  font-size: 13px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(245, 179, 1, 0.25);
+  white-space: nowrap;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transition: 0.5s;
+}
+.btn:hover::after { left: 100%; }
+.btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 24px rgba(245, 179, 1, 0.4);
+}
+.btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Button Variants */
+.btn.ghost {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-subtle);
+  color: var(--text-main);
+  box-shadow: none;
+}
+.btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(245, 179, 1, 0.4);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+.btn.cyan {
+  background: var(--grad-cyan);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+}
+.btn.cyan:hover {
+  box-shadow: 0 8px 24px rgba(6, 182, 212, 0.45);
+}
+.btn.danger {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  box-shadow: none;
+}
+.btn.danger:hover {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+  box-shadow: 0 6px 20px var(--red-glow);
+}
+.btn.sm {
+  padding: 7px 13px;
+  font-size: 12px;
+  border-radius: 7px;
+}
+.btn.block { width: 100%; }
+.btn svg { flex-shrink: 0; }
+
+.btn-spin {
+  display: inline-block;
+  width: 13px; height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+  margin-right: 6px;
+}
+
+/* ==========================================================================
+   LOGIN & AUTH VIEWS
+   ========================================================================== */
+#loginView, #resetView {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-lg);
+  padding: 44px 40px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-card);
+  animation: scaleIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-gold);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.auth-logo img {
+  height: 40px;
+  width: auto;
+  animation: glowPulse 3.5s ease-in-out infinite;
+}
+.auth-logo h1 {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.auth-logo h1 b {
+  background: var(--grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.auth-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: rgba(245, 179, 1, 0.12);
+  border: 1px solid rgba(245, 179, 1, 0.25);
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+.auth-sub {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* Fields */
+.field {
+  margin-bottom: 18px;
+  text-align: left;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+  letter-spacing: 0.2px;
+}
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-wrap svg.icon-field {
+  position: absolute;
+  left: 14px;
+  color: var(--text-dim);
+  pointer-events: none;
+  transition: color 0.2s;
+}
+.field input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--line-subtle);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px 12px 42px;
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.field input:focus {
+  border-color: var(--gold);
+  background: rgba(14, 20, 31, 0.95);
+  box-shadow: 0 0 0 3px rgba(245, 179, 1, 0.15);
+}
+.field input:focus + svg.icon-field {
+  color: var(--gold);
+}
+.pw-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.pw-toggle:hover { color: var(--text-main); }
+
+/* Alerts */
+.alert {
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  display: none;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.45;
+  animation: slideDown 0.25s ease;
+}
+.alert.err {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+}
+.alert.ok {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #86efac;
+}
+
+.auth-links {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+.auth-links span { opacity: 0.4; }
+
+/* ==========================================================================
+   MAIN APPLICATION VIEW
+   ========================================================================== */
+#appView {
+  position: relative;
+  z-index: 1;
+  display: none;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 26px;
+  background: rgba(12, 16, 23, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line-subtle);
+  flex-shrink: 0;
+}
+.brand-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+.brand-logo img {
+  height: 28px;
+  width: auto;
+}
+.brand-logo b {
+  background: var(--grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--green);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.sync-pill .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+/* User Profile Badge */
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-subtle);
+  padding: 6px 14px 6px 8px;
+  border-radius: 30px;
+}
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--grad-gold);
+  color: #000;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(245, 179, 1, 0.3);
+}
+.user-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.user-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.user-email {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Top Warning & Announcement Bars */
+#warnBar {
+  display: none;
+  background: rgba(239, 68, 68, 0.14);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  padding: 11px 26px;
+  font-size: 13px;
+  font-weight: 600;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+}
+#annBar {
+  display: none;
+  background: rgba(245, 179, 1, 0.1);
+  border-bottom: 1px solid rgba(245, 179, 1, 0.35);
+  color: #ffd269;
+  padding: 10px 26px;
+  font-size: 13px;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+/* Main Content Area */
+main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dashboard Controls / Search & Filters */
+.dashboard-controls {
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.top-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.title-group h1 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.machine-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-subtle);
+  color: var(--text-muted);
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.machine-chip:hover {
+  border-color: var(--gold);
+  color: var(--text-main);
+  background: rgba(245, 179, 1, 0.08);
+}
+.machine-chip svg { color: var(--gold); }
+
+/* Filter Tabs & Search Bar */
+.filter-search-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-bottom: 1px solid var(--line-subtle);
+  padding-bottom: 16px;
+}
+.tab-group {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--line-subtle);
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+.tab-btn:hover {
+  color: var(--text-main);
+}
+.tab-btn.active {
+  background: var(--bg-card-hover);
+  color: var(--gold);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+.tab-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.tab-btn.active .tab-count {
+  background: rgba(245, 179, 1, 0.2);
+  color: var(--gold);
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 250px;
+}
+.search-box svg {
+  position: absolute;
+  left: 12px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.search-box input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 36px;
+  font-size: 12.5px;
+  color: var(--text-main);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.search-box input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(245, 179, 1, 0.15);
+}
+
+/* ==========================================================================
+   PRODUCT CARDS LIST
+   ========================================================================== */
+.plist {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.prow {
+  display: grid;
+  grid-template-columns: 88px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--line-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s,
+              box-shadow 0.22s,
+              background 0.22s;
+  animation: scaleIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  position: relative;
+  overflow: hidden;
+}
+.prow::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+  background: transparent;
+  transition: background 0.2s;
+}
+.prow:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-hover);
+  background: var(--bg-card-hover);
+  box-shadow: var(--shadow-hover);
+}
+.prow:hover::before {
+  background: var(--grad-gold);
+}
+.prow.is-active-here {
+  border-color: rgba(16, 185, 129, 0.25);
+}
+.prow.is-active-here::before {
+  background: var(--green);
+}
+.prow.dead {
+  opacity: 0.65;
+  border-color: rgba(239, 68, 68, 0.45);
+}
+.prow.dead::before {
+  background: var(--red);
+}
+
+/* Artwork / Visualizer Box */
+.pimg-wrap {
+  width: 88px;
+  height: 72px;
+  background: #090d14;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+.pimg-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+.prow:hover .pimg-wrap img {
+  transform: scale(1.06);
+}
+
+/* Animated Synth Visualizer Fallback */
+.fallback-visualizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  height: 34px;
+  width: 100%;
+  padding-bottom: 6px;
+}
+.viz-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--grad-gold);
+  animation: waveBars 1.6s ease-in-out infinite alternate;
+}
+.viz-bar:nth-child(1) { animation-delay: 0.1s; height: 10px; }
+.viz-bar:nth-child(2) { animation-delay: 0.3s; height: 22px; }
+.viz-bar:nth-child(3) { animation-delay: 0.5s; height: 14px; }
+.viz-bar:nth-child(4) { animation-delay: 0.2s; height: 28px; }
+.viz-bar:nth-child(5) { animation-delay: 0.6s; height: 18px; }
+.viz-bar:nth-child(6) { animation-delay: 0.4s; height: 8px; }
+
+/* Product Info */
+.pinfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pinfo-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.pname {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
+}
+.category-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+.tag-update {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(59,130,246,0.25));
+  border: 1px solid rgba(6, 182, 212, 0.5);
+  color: #38bdf8;
+  padding: 2px 9px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: pulseDot 2.5s infinite;
+}
+.tag-dead {
+  font-size: 10.5px;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.pdetails {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.pdetails span { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Hardware Slots Display */
+.device-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.slots-dots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.slot-dot {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+.slot-dot.filled-here {
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+.slot-dot.filled-other {
+  background: var(--gold);
+  box-shadow: 0 0 6px rgba(245, 179, 1, 0.6);
+}
+
+/* State Badge */
+.pstate {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 5px;
+}
+.pstate.ok { color: #4ade80; }
+.pstate.warn { color: #facc15; }
+.pstate.bad { color: #f87171; }
+.pstate.dim { color: var(--text-dim); }
+
+/* Product Actions Area */
+.pbtns {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+  animation: fadeIn 0.4s ease;
+}
+.empty-icon {
+  margin: 0 auto 16px;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(245, 179, 1, 0.08);
+  border: 1px solid rgba(245, 179, 1, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+}
+.empty-state h3 {
+  font-size: 18px;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+.empty-state p {
+  font-size: 13.5px;
+  color: var(--text-dim);
+  max-width: 360px;
+  margin: 0 auto 20px;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   MODAL DIALOG (Replaces native confirm/alert)
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.show { display: flex; }
+.modal-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-hover);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(245, 179, 1, 0.18);
+  animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+.modal-icon {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 179, 1, 0.12);
+  color: var(--gold);
+}
+.modal-icon.danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--red);
+}
+.modal-icon.cyan {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--cyan);
+}
+.modal-card h2 {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+.modal-card p {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.modal-actions .btn {
+  flex: 1;
+}
+
+/* ==========================================================================
+   TOAST HUD
+   ========================================================================== */
+#toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(90px);
+  background: rgba(18, 25, 38, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--line-hover);
+  padding: 13px 24px;
+  border-radius: 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-main);
+  z-index: 1200;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 179, 1, 0.2);
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Footer */
+footer {
+  padding: 10px 28px;
+  border-top: 1px solid var(--line-subtle);
+  background: rgba(10, 13, 20, 0.9);
+  color: var(--text-dim);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+footer a { color: var(--text-dim); }
+footer a:hover { color: var(--gold); }
+</style>
+</head>
+<body>
+
+<!-- Ambient Studio Glow & Audio Grid -->
+<div class="ambient-bg">
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+  <div class="ambient-grid"></div>
+</div>
+
+<!-- ==========================================================================
+     LOGIN VIEW
+     ========================================================================== -->
+<div id="loginView">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="logo.png" alt="" onerror="this.style.display='none'">
+        <h1>FALCON <b>ACCESS</b></h1>
+      </div>
+      <div><span class="auth-badge">Audio Licensing Hub</span></div>
+      <p class="auth-sub">Log in with your Falcon Eye Music store account</p>
+    </div>
+
+    <div class="alert err" id="loginErr"></div>
+
+    <form onsubmit="return doLogin(event)">
+      <div class="field">
+        <label>Account Email</label>
+        <div class="input-wrap">
+          <input type="email" id="lEmail" placeholder="producer@falconeyesl.com" required autocomplete="email">
+          <svg class="icon-field" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="input-wrap">
+          <input type="password" id="lPass" placeholder="••••••••" required autocomplete="current-password">
+          <svg class="icon-field" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <button type="button" class="pw-toggle" onclick="togglePass('lPass', this)" title="Show/Hide Password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn block" id="loginBtn" type="submit">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In to Access
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <a onclick="resetPass()">Forgot password?</a>
+      <span>•</span>
+      <a onclick="openSite('/signup.html')">Create Account</a>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     PASSWORD RESET VIEW
+     ========================================================================== -->
+<div id="resetView" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <img src="logo.png" alt="" onerror="this.style.display='none'">
+        <h1>FALCON <b>ACCESS</b></h1>
+      </div>
+      <div><span class="auth-badge">Account Recovery</span></div>
+      <p class="auth-sub">Reset your account credentials</p>
+    </div>
+
+    <div class="alert err" id="resetErr"></div>
+    <div class="alert ok" id="resetOk"></div>
+
+    <div id="resetStep1">
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;line-height:1.45;">Enter your account email below. We'll send a secure password reset link to your inbox.</p>
+      <form onsubmit="return doForgot(event)">
+        <div class="field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <input type="email" id="rEmail" placeholder="yourname@gmail.com" required>
+            <svg class="icon-field" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+        </div>
+        <button class="btn block" id="forgotBtn" type="submit">Send Verification Link</button>
+      </form>
+    </div>
+
+    <div id="resetStep2" style="display:none;">
+      <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;line-height:1.45;">Check your inbox. Paste the emailed link (or token code) below along with your new password.</p>
+      <form onsubmit="return doReset(event)">
+        <div class="field">
+          <label>Reset Link or Token</label>
+          <div class="input-wrap">
+            <input id="rToken" placeholder="Paste full link or ?token=..." required>
+            <svg class="icon-field" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+        </div>
+        <div class="field">
+          <label>New Password (min 8 characters)</label>
+          <div class="input-wrap">
+            <input type="password" id="rPass" placeholder="••••••••" required minlength="8">
+            <svg class="icon-field" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+        </div>
+        <button class="btn block" id="resetBtn" type="submit">Update Password</button>
+      </form>
+    </div>
+
+    <div class="auth-links">
+      <a onclick="showLogin()">← Back to Sign In</a>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     APP SHELL
+     ========================================================================== -->
+<div id="appView">
+  <!-- Top App Navigation -->
+  <header>
+    <div class="brand-area">
+      <div class="brand-logo">
+        <img src="logo.png" alt="" onerror="this.style.display='none'">
+        <span>FALCON <b>ACCESS</b></span>
+      </div>
+      <div class="sync-pill"><span class="dot"></span> SYNCED</div>
+    </div>
+
+    <div class="header-actions">
+      <!-- User Profile Chip -->
+      <div class="user-badge">
+        <div class="user-avatar" id="avatarInitial">FE</div>
+        <div class="user-info">
+          <span class="user-name" id="whoName">User</span>
+          <span class="user-email" id="whoEmail">user@email.com</span>
+        </div>
+      </div>
+
+      <button class="btn ghost sm" onclick="refresh(true)" id="refreshBtn" title="Sync licenses with server">
+        <svg id="refreshIco" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+        Sync
+      </button>
+      <button class="btn ghost sm" onclick="openSite('/shop.html')" title="Visit Falcon Eye VST Store">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Store
+      </button>
+      <button class="btn danger sm" onclick="logout()" title="Log out from this workstation">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log Out
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification Bars -->
+  <div id="warnBar"></div>
+  <div id="annBar"></div>
+
+  <!-- Main View -->
+  <main>
+    <div class="dashboard-controls">
+      <div class="top-title-row">
+        <div class="title-group">
+          <h1>My Audio Library</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="machine-chip" onclick="copyMachineId()" title="Click to copy full Machine ID">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            <span id="midPill">MID: ...</span>
+          </div>
+          <span style="font-size:12px;color:var(--text-dim);font-family:var(--font-mono);" id="pollMeta">Auto-checks 1m</span>
+        </div>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="filter-search-row">
+        <div class="tab-group">
+          <button class="tab-btn active" onclick="setFilter('all', this)">All <span class="tab-count" id="countAll">0</span></button>
+          <button class="tab-btn" onclick="setFilter('activated', this)">Activated <span class="tab-count" id="countActive">0</span></button>
+          <button class="tab-btn" onclick="setFilter('updates', this)">Updates <span class="tab-count" id="countUpdates">0</span></button>
+          <button class="tab-btn" onclick="setFilter('not_installed', this)">Not Installed <span class="tab-count" id="countNotInstalled">0</span></button>
+        </div>
+
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Search by plugin name or category..." oninput="handleSearch(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Cards Container -->
+    <div class="plist" id="plist">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <div class="btn-spin" style="width:28px;height:28px;border-width:3px;margin:0;"></div>
+        </div>
+        <h3>Connecting to Falcon Engine</h3>
+        <p>Synchronizing your licenses and workstation certificates...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer Telemetry -->
+  <footer>
+    <span>Falcon Eye Corporation — Falcon Access <span id="faVer">v1.0.0</span></span>
+    <span>Workstation Hardware ID: <span id="midMeta"></span></span>
+  </footer>
+</div>
+
+<!-- ==========================================================================
+     CUSTOM CONFIRMATION MODAL (Glassmorphic)
+     ========================================================================== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-card">
+    <div class="modal-icon" id="modalIcon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <h2 id="modalTitle">Confirm Action</h2>
+    <p id="modalDesc">Are you sure you want to proceed?</p>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal(false)">Cancel</button>
+      <button class="btn" id="modalConfirmBtn" onclick="closeModal(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Toast HUD -->
+<div id="toast"></div>
+
+<!-- ==========================================================================
+     CORE APPLICATION JAVASCRIPT
+     ========================================================================== -->
+<script>
+let CFG = {}, TOKEN = localStorage.getItem('fa_token') || '', MID = '', MYIP = '';
+let PRODUCTS = [], INSTALLED = {}, REALLY_INSTALLED = {}, pollTimer = null;
+let currentFilter = 'all', searchQuery = '';
+let modalResolve = null;
+
+const POLL_MS = 1 * 60 * 1000; // Realtime-ish sync: every 1 minute
+const IS_MAC = /Mac/i.test(navigator.platform || navigator.userAgent || '');
+
+function pickInstaller(p) {
+  return IS_MAC ? (p.installerMac || p.installer || '') : (p.installer || p.installerMac || '');
+}
+
+/* ---------- Icons Set ---------- */
+const ICONS = {
+  bolt: '<path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/>',
+  download: '<path d="M12 3v13"/><path d="M6.5 11.5 12 17l5.5-5.5"/><path d="M4 21h16"/>',
+  fileText: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
+  check: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  ban: '<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>',
+  pause: '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  dot: '<circle cx="12" cy="12" r="5"/>',
+  circle: '<circle cx="12" cy="12" r="8"/>',
+  warning: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  megaphone: '<path d="M3 11v3a1 1 0 0 0 1 1h2l4 4V5L6 9H4a1 1 0 0 0-1 1Z"/><path d="M15 8a4 4 0 0 1 0 8"/><path d="M18 5a8 8 0 0 1 0 14"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>'
+};
+
+function ic(name, size = 14) {
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">${ICONS[name] || ''}</svg>`;
+}
+
+/* ---------- UI Utilities ---------- */
+function toast(m, icon = 'check') {
+  const t = document.getElementById('toast');
+  t.innerHTML = ic(icon, 16) + '<span>' + esc(m) + '</span>';
+  t.classList.add('show');
+  clearTimeout(window._tt);
+  window._tt = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+async function api(action, data) {
+  const body = Object.assign({ action }, data || {});
+  if (TOKEN) body.token = TOKEN;
+  return await window.FA.api(body);
+}
+
+function openSite(p) { window.FA.openExternal(CFG.siteUrl + p); }
+function FAopen(u) { window.FA.openExternal(decodeURIComponent(u)); }
+
+function togglePass(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.style.color = 'var(--gold)';
+  } else {
+    input.type = 'password';
+    btn.style.color = 'var(--text-dim)';
+  }
+}
+
+function copyMachineId() {
+  if (!MID) return;
+  navigator.clipboard.writeText(MID);
+  toast('Machine ID copied to clipboard!', 'copy');
+}
+
+/* ---------- Custom Modal Dialog System ---------- */
+function showModal({ title, desc, confirmText = 'Confirm', confirmClass = 'btn', icon = 'warning', iconClass = '' }) {
+  return new Promise(resolve => {
+    modalResolve = resolve;
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalDesc').innerHTML = desc;
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    confirmBtn.textContent = confirmText;
+    confirmBtn.className = confirmClass;
+    const iconContainer = document.getElementById('modalIcon');
+    iconContainer.className = 'modal-icon ' + iconClass;
+    iconContainer.innerHTML = ic(icon, 24);
+    document.getElementById('confirmModal').classList.add('show');
+  });
+}
+
+function closeModal(result) {
+  document.getElementById('confirmModal').classList.remove('show');
+  if (modalResolve) {
+    modalResolve(result);
+    modalResolve = null;
+  }
+}
+
+/* ---------- In-App Password Reset ---------- */
+function resetPass() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('resetView').style.display = 'flex';
+  document.getElementById('resetStep1').style.display = '';
+  document.getElementById('resetStep2').style.display = 'none';
+  document.getElementById('resetErr').style.display = 'none';
+  document.getElementById('resetOk').style.display = 'none';
+}
+
+function showLogin() {
+  document.getElementById('resetView').style.display = 'none';
+  document.getElementById('loginView').style.display = 'flex';
+}
+
+async function doForgot(e) {
+  e.preventDefault();
+  const btn = document.getElementById('forgotBtn'), err = document.getElementById('resetErr'), ok = document.getElementById('resetOk');
+  err.style.display = 'none'; ok.style.display = 'none';
+  btn.disabled = true; btn.innerHTML = '<span class="btn-spin"></span>Sending link…';
+  await api('auth.forgot', { email: document.getElementById('rEmail').value.trim() });
+  btn.disabled = false; btn.textContent = 'Send Verification Link';
+  document.getElementById('resetStep1').style.display = 'none';
+  document.getElementById('resetStep2').style.display = '';
+  ok.textContent = 'If that email is registered in our database, a reset verification code has just been sent to your inbox.';
+  ok.style.display = 'flex';
+  return false;
+}
+
+async function doReset(e) {
+  e.preventDefault();
+  const btn = document.getElementById('resetBtn'), err = document.getElementById('resetErr'), ok = document.getElementById('resetOk');
+  err.style.display = 'none'; ok.style.display = 'none';
+  btn.disabled = true; btn.innerHTML = '<span class="btn-spin"></span>Updating password…';
+  let token = document.getElementById('rToken').value.trim();
+  const m = token.match(/[?&]token=([^&\s]+)/);
+  if (m) token = decodeURIComponent(m[1]);
+  const r = await api('auth.reset', { resetToken: token, password: document.getElementById('rPass').value });
+  btn.disabled = false; btn.textContent = 'Update Password';
+  if (r.ok) {
+    document.getElementById('resetStep2').style.display = 'none';
+    ok.textContent = 'Password updated successfully! Redirecting you to login…';
+    ok.style.display = 'flex';
+    setTimeout(showLogin, 1800);
+  } else {
+    const msgs = {
+      weak_password: 'Password must be at least 8 characters long.',
+      invalid_or_expired: 'That verification link/code is invalid or has expired. Please request a new one.'
+    };
+    err.textContent = msgs[r.error] || ('Error: ' + r.error);
+    err.style.display = 'flex';
+  }
+  return false;
+}
+
+/* ---------- Authentication ---------- */
+async function doLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn'), err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spin"></span>Authenticating…';
+  
+  const r = await api('fa.login', {
+    email: document.getElementById('lEmail').value.trim(),
+    password: document.getElementById('lPass').value
+  });
+  
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In to Access';
+  
+  if (r.ok) {
+    TOKEN = r.token;
+    localStorage.setItem('fa_token', TOKEN);
+    localStorage.setItem('fa_user', JSON.stringify(r.user));
+    showApp();
+  } else {
+    const msgs = {
+      invalid_credentials: 'Wrong email or password.',
+      email_not_verified: 'Please verify your email address first — check your inbox.',
+      account_blocked: 'This account has been suspended. Please contact Falcon Eye Music support.',
+      network: 'Cannot connect to Falcon licensing servers. Check your internet connection.'
+    };
+    err.textContent = msgs[r.error] || ('Authentication failed: ' + r.error);
+    err.style.display = 'flex';
+  }
+  return false;
+}
+
+function logout() {
+  localStorage.removeItem('fa_token');
+  TOKEN = '';
+  clearInterval(pollTimer);
+  document.getElementById('appView').style.display = 'none';
+  document.getElementById('loginView').style.display = 'flex';
+}
+
+/* ---------- Search & Filter Logic ---------- */
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  render();
+}
+
+function handleSearch(val) {
+  searchQuery = (val || '').toLowerCase().trim();
+  render();
+}
+
+function updateFilterCounts() {
+  let activeCount = 0, updateCount = 0, notInstCount = 0;
+  for (const p of PRODUCTS) {
+    const inst = INSTALLED[p.productId];
+    const reallyInstalled = REALLY_INSTALLED[p.productId];
+    if (p.activeOnThisMachine) activeCount++;
+    if (reallyInstalled && inst && p.latestVersion && inst.version !== p.latestVersion) updateCount++;
+    if (!reallyInstalled) notInstCount++;
+  }
+  document.getElementById('countAll').textContent = PRODUCTS.length;
+  document.getElementById('countActive').textContent = activeCount;
+  document.getElementById('countUpdates').textContent = updateCount;
+  document.getElementById('countNotInstalled').textContent = notInstCount;
+}
+
+/* ---------- State Analysis ---------- */
+function stateInfo(p) {
+  const inst = INSTALLED[p.productId];
+  const reallyInstalled = REALLY_INSTALLED[p.productId];
+  const used = p.machinesUsed || 0;
+  const max = p.machinesMax || 3;
+  
+  if (p.licenseStatus === 'REVOKED')
+    return { cls: 'bad', ic: 'ban', txt: 'License revoked by administrator', dead: true, used, max };
+  if (p.licenseStatus === 'DISABLED')
+    return { cls: 'bad', ic: 'pause', txt: 'License temporarily disabled', dead: true, used, max };
+  if (p.licenseStatus === 'LOCKED')
+    return { cls: 'bad', ic: 'lock', txt: 'Security locked — contact support', dead: true, used, max };
+
+  if (p.activeOnThisMachine && pickInstaller(p) && reallyInstalled === false)
+    return { cls: 'warn', ic: 'warning', txt: 'Activated, but VST3 not detected — install below', dead: false, used, max };
+  if (p.activeOnThisMachine)
+    return { cls: 'ok', ic: 'check', txt: 'Activated on this workstation' + (inst ? ' (v' + inst.version + ')' : ''), dead: false, used, max };
+  if (p.licenseStatus === 'ACTIVE')
+    return { cls: 'warn', ic: 'dot', txt: 'Active on a different computer — click to switch here', dead: false, used, max };
+    
+  return { cls: 'dim', ic: 'circle', txt: 'Not activated on this machine' + (inst ? ' (v' + inst.version + ')' : ''), dead: false, used, max };
+}
+
+/* ---------- Product Rendering ---------- */
+function render() {
+  const el = document.getElementById('plist');
+  updateFilterCounts();
+
+  if (!PRODUCTS.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${ic('music', 32)}</div>
+        <h3>No Products in Your Library</h3>
+        <p>You haven't purchased or linked any Falcon VST plugins to this account yet.</p>
+        <button class="btn" onclick="openSite('/shop.html')">Browse Falcon Store</button>
+      </div>`;
+    return;
+  }
+
+  // Filter & Search Evaluation
+  const filtered = PRODUCTS.filter(p => {
+    const inst = INSTALLED[p.productId];
+    const reallyInstalled = REALLY_INSTALLED[p.productId];
+    const hasUpdate = reallyInstalled && inst && p.latestVersion && inst.version !== p.latestVersion;
+
+    if (currentFilter === 'activated' && !p.activeOnThisMachine) return false;
+    if (currentFilter === 'updates' && !hasUpdate) return false;
+    if (currentFilter === 'not_installed' && reallyInstalled) return false;
+
+    if (searchQuery) {
+      const matchName = (p.name || '').toLowerCase().includes(searchQuery);
+      const matchCat = (p.category || '').toLowerCase().includes(searchQuery);
+      const matchId = (p.productId || '').toLowerCase().includes(searchQuery);
+      if (!matchName && !matchCat && !matchId) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${ic('search', 28)}</div>
+        <h3>No Matching Plugins Found</h3>
+        <p>No products match your current search or tab filters.</p>
+        <button class="btn ghost sm" onclick="setFilter('all', document.querySelectorAll('.tab-btn')[0]); document.getElementById('searchInput').value=''; searchQuery=''; render();">Reset Filters</button>
+      </div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map((p, i) => {
+    const st = stateInfo(p);
+    const inst = INSTALLED[p.productId];
+    const reallyInstalled = REALLY_INSTALLED[p.productId];
+    const canSkipInstallCheck = !pickInstaller(p);
+    const hasUpdate = reallyInstalled && inst && p.latestVersion && inst.version !== p.latestVersion;
+    
+    // Hardware slot indicators (3 slots)
+    const slotDots = [0, 1, 2].map(idx => {
+      if (idx < st.used) {
+        return idx === 0 && p.activeOnThisMachine 
+          ? '<span class="slot-dot filled-here" title="Active on this PC"></span>'
+          : '<span class="slot-dot filled-other" title="Active on registered device"></span>';
+      }
+      return '<span class="slot-dot" title="Available device slot"></span>';
+    }).join('');
+
+    return `
+    <div class="prow ${p.activeOnThisMachine ? 'is-active-here' : ''} ${st.dead ? 'dead' : ''}" style="animation-delay:${Math.min(i, 8) * 45}ms">
+      <!-- Thumbnail / Audio Visualizer -->
+      <div class="pimg-wrap">
+        ${p.image 
+          ? `<img src="${esc(p.image)}" alt="" onerror="this.outerHTML='<div class=\\'fallback-visualizer\\'><div class=\\'viz-bar\\'></div><div class=\\'viz-bar\\'></div><div class=\\'viz-bar\\'></div><div class=\\'viz-bar\\'></div><div class=\\'viz-bar\\'></div><div class=\\'viz-bar\\'></div></div>'">`
+          : `<div class="fallback-visualizer"><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div><div class="viz-bar"></div></div>`
+        }
+      </div>
+
+      <!-- Main Info -->
+      <div class="pinfo">
+        <div class="pinfo-top">
+          <span class="pname">${esc(p.name)}</span>
+          <span class="category-pill">${esc(p.category || 'VST3 / AU')}</span>
+          ${hasUpdate ? `<span class="tag-update">${ic('bolt', 12)} UPDATE v${esc(p.latestVersion)}</span>` : ''}
+          ${st.dead ? `<span class="tag-dead">${esc(p.licenseStatus)}</span>` : ''}
+        </div>
+
+        <div class="pdetails">
+          <span>Version: <b>v${esc(p.latestVersion || '1.0.0')}</b></span>
+          ${inst && inst.version ? `<span>• Installed: <b>v${esc(inst.version)}</b></span>` : ''}
+        </div>
+
+        <div class="device-meter">
+          <div class="slots-dots">${slotDots}</div>
+          <span>${st.used} / ${st.max} Registered Devices</span>
+        </div>
+
+        <div class="pstate ${st.cls}">${ic(st.ic, 13)} <span>${st.txt}</span></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="pbtns">
+        ${!st.dead && !p.activeOnThisMachine && ['ASSIGNED','ACTIVE'].includes(p.licenseStatus) && (reallyInstalled || canSkipInstallCheck)
+          ? `<button class="btn sm" id="actbtn-${p.productId}" onclick="activate('${p.productId}', this)">
+               ${ic('bolt', 13)} ${p.licenseStatus === 'ACTIVE' ? 'Switch to this PC' : 'Activate Plugin'}
+             </button>` 
+          : ''}
+
+        ${!st.dead && !p.activeOnThisMachine && ['ASSIGNED','ACTIVE'].includes(p.licenseStatus) && !reallyInstalled && !canSkipInstallCheck
+          ? `<span class="meta" style="font-size:11.5px;color:var(--text-dim);font-weight:600;">Install plugin first</span>` 
+          : ''}
+
+        ${p.activeOnThisMachine
+          ? `<button class="btn ghost sm" onclick="deactivate('${p.productId}','${esc(p.key)}', '${esc(p.name)}', this)" title="Deactivate on this PC">Deactivate</button>` 
+          : ''}
+
+        ${!st.dead && pickInstaller(p)
+          ? `<button class="btn ${hasUpdate ? 'cyan' : (reallyInstalled ? 'ghost' : '')} sm" onclick="download('${p.productId}')">
+               ${ic('download', 13)} ${hasUpdate ? 'Update Now' : (reallyInstalled ? 'Reinstall' : 'Install')}
+             </button>` 
+          : ''}
+
+        ${!st.dead && p.instructions
+          ? `<button class="btn ghost sm" onclick="FAopen('${encodeURIComponent(p.instructions)}')" title="View Documentation & Quickstart">
+               ${ic('fileText', 13)}
+             </button>` 
+          : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- Actions ---------- */
+async function activate(productId, btn) {
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spin"></span>Activating…';
+  }
+  const r = await api('fa.activate', { productId, machineId: MID, ip: MYIP });
+  if (r.ok) {
+    const p = PRODUCTS.find(x => x.productId === productId);
+    await window.FA.writeLicense(productId, {
+      key: p ? p.key : '',
+      product: productId,
+      machineId: MID,
+      token: r.licenseToken
+    });
+    toast('Activated! ' + (p ? p.name : 'Plugin') + ' is ready in your DAW.', 'check');
+    refresh(false);
+  } else {
+    const msgs = {
+      locked: 'This license is locked. Contact Falcon Eye Music support to unlock.',
+      revoked: 'This license has been revoked by administration.',
+      disabled: 'This license is disabled.',
+      machine_limit_reached: 'This license is already registered on 3 workstations. Deactivate one of your devices to free up a slot.',
+      no_license: 'No active license found for this product on your account.',
+      account_blocked: 'Your account has been suspended. Contact support.',
+      not_your_license: 'This license belongs to a different account.'
+    };
+    toast(msgs[r.error] || ('Activation failed: ' + r.error), 'warning');
+    refresh(false);
+  }
+}
+
+async function deactivate(productId, key, productName, btn) {
+  const confirmed = await showModal({
+    title: 'Deactivate ' + (productName || 'Product'),
+    desc: `Are you sure you want to deactivate <b>${esc(productName || 'this plugin')}</b> on this computer?<br><br>This will release a workstation slot so you can activate it on another studio PC or laptop.`,
+    confirmText: 'Deactivate',
+    confirmClass: 'btn danger',
+    icon: 'warning',
+    iconClass: 'danger'
+  });
+
+  if (!confirmed) return;
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spin"></span>Deactivating…';
+  }
+
+  const r = await api('lic.deactivate', { key, machineId: MID });
+  if (r.ok) {
+    await window.FA.removeLicense(productId);
+    toast('Deactivated on this computer. Slot freed.', 'check');
+    refresh(false);
+  } else {
+    toast('Deactivation error: ' + r.error, 'warning');
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Deactivate';
+    }
+  }
+}
+
+async function download(productId) {
+  const p = PRODUCTS.find(x => x.productId === productId);
+  const url = p && pickInstaller(p);
+  if (!url) return;
+
+  window.FA.openExternal(url);
+
+  setTimeout(async () => {
+    const confirmed = await showModal({
+      title: 'Complete Installation',
+      desc: `The installer for <b>${esc(p.name)}</b> has been downloaded.<br><br>Once the setup installer finishes running on your system, click <b>Confirm Installation</b> to update your library version to <b>v${esc(p.latestVersion)}</b>.`,
+      confirmText: 'Confirm Installation',
+      confirmClass: 'btn cyan',
+      icon: 'download',
+      iconClass: 'cyan'
+    });
+
+    if (confirmed) {
+      INSTALLED = await window.FA.setInstalled(productId, p.latestVersion);
+      REALLY_INSTALLED[productId] = await window.FA.checkPluginInstalled(p.name);
+      toast('Installed version updated to v' + p.latestVersion, 'check');
+      render();
+    }
+  }, 1200);
+}
+
+/* ---------- Refresh & Realtime License Enforcement ---------- */
+async function refresh(manual, retriesLeft = 3) {
+  const refreshIco = document.getElementById('refreshIco');
+  if (refreshIco && manual) refreshIco.style.animation = 'spin 0.8s linear infinite';
+
+  const r = await api('fa.products', { machineId: MID });
+  if (refreshIco) refreshIco.style.animation = '';
+
+  if (!r.ok) {
+    if (r.error === 'auth_required') { logout(); return; }
+    if (retriesLeft > 0) {
+      await new Promise(res => setTimeout(res, 2500));
+      return refresh(manual, retriesLeft - 1);
+    }
+    if (manual) toast('Cannot connect to license server — showing local cache.', 'warning');
+    return;
+  }
+
+  // Profile Identity
+  const name = r.name || 'Studio User';
+  const email = r.email || '';
+  document.getElementById('whoName').textContent = name;
+  document.getElementById('whoEmail').textContent = email;
+  
+  // Set Avatar Initials
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'FE';
+  document.getElementById('avatarInitial').textContent = initials;
+
+  // Realtime License Revocation Enforcement
+  const dead = [];
+  for (const p of r.products) {
+    const wasHere = await window.FA.hasLicense(p.productId);
+    if (!wasHere) continue;
+
+    if (['REVOKED', 'DISABLED', 'LOCKED'].includes(p.licenseStatus)) {
+      await window.FA.removeLicense(p.productId);
+      dead.push(p.name + ' (' + p.licenseStatus.toLowerCase() + ')');
+    } else if (p.licenseStatus === 'ACTIVE' && !p.activeOnThisMachine) {
+      await window.FA.removeLicense(p.productId);
+    }
+  }
+
+  const warn = document.getElementById('warnBar');
+  if (dead.length) {
+    warn.innerHTML = ic('warning', 16) + ' <span><b>WARNING:</b> ' + esc(dead.join(', ')) + ' — revoked or disabled on this computer. Contact Falcon Eye Music support.</span>';
+    warn.style.display = 'flex';
+  } else {
+    warn.style.display = 'none';
+  }
+
+  // Announcements
+  const ann = document.getElementById('annBar');
+  if (r.announcements && r.announcements.length) {
+    const a = r.announcements[0];
+    ann.innerHTML = ic('megaphone', 16) + ' <span><b>' + esc(a.title || 'Announcement') + ':</b> ' + esc(a.text || '') + '</span>';
+    ann.style.display = 'flex';
+  } else {
+    ann.style.display = 'none';
+  }
+
+  PRODUCTS = r.products || [];
+  INSTALLED = await window.FA.getInstalled();
+  REALLY_INSTALLED = {};
+  await Promise.all(PRODUCTS.map(async p => {
+    REALLY_INSTALLED[p.productId] = await window.FA.checkPluginInstalled(p.name);
+  }));
+
+  render();
+  document.getElementById('pollMeta').textContent = 'Last sync: ' + new Date().toLocaleTimeString();
+}
+
+/* ---------- Boot Flow ---------- */
+async function showApp() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('resetView').style.display = 'none';
+  document.getElementById('appView').style.display = 'flex';
+
+  const u = JSON.parse(localStorage.getItem('fa_user') || '{}');
+  const name = u.name || 'Studio User';
+  document.getElementById('whoName').textContent = name;
+  document.getElementById('whoEmail').textContent = u.email || '';
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'FE';
+  document.getElementById('avatarInitial').textContent = initials;
+
+  await refresh(true);
+  clearInterval(pollTimer);
+  pollTimer = setInterval(() => refresh(false), POLL_MS);
+}
+
+(async () => {
+  CFG = await window.FA.config();
+  MID = await window.FA.machineId();
+  MYIP = await window.FA.publicIp();
+
+  document.getElementById('faVer').textContent = 'v' + CFG.version;
+  document.getElementById('midMeta').textContent = MID;
+  document.getElementById('midPill').textContent = 'MID: ' + MID.slice(0, 10) + '…';
+
+  if (TOKEN) {
+    showApp();
+  }
+})();
+</script>
+</body>
+</html>

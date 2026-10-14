@@ -1,0 +1,56 @@
+name: Build Falcon Access (macOS)
+
+on:
+  push:
+    paths:
+      - 'falcon-access/**'
+      - '.github/workflows/build-access-mac.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: falcon-access
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit
+
+      - name: Build Universal macOS Package (.pkg)
+        run: npm run dist:mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      - name: List Output Files
+        run: ls -la dist/
+
+      - name: Upload Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: falcon-access-macos-pkg
+          path: falcon-access/dist/*.pkg
+          if-no-files-found: error
+
+      - name: Publish Release Asset
+        uses: softprops/action-gh-release@v2
+        if: always()
+        with:
+          tag_name: access-latest
+          name: "Falcon Access macOS Universal Installer"
+          files: falcon-access/dist/*.pkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
