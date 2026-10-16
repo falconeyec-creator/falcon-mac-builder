@@ -2,6 +2,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "BgImage.h"
+#include "CustomKnob.h"
 
 // Style switches supplied by the Maker at generation time
 #ifndef FALCON_KNOB_STYLE
@@ -148,6 +149,17 @@ namespace falcon
 
     inline bool hasCustomBg() { return falconbg::hasImage && customBgImage().isValid(); }
 
+    // Custom KnobMan filmstrip image (optional) — decoded once and cached
+    inline juce::Image& customKnobImage()
+    {
+        static juce::Image img = falconknob::hasCustomKnob
+            ? juce::ImageFileFormat::loadFrom (falconknob::knobData, (size_t) falconknob::knobDataSize)
+            : juce::Image();
+        return img;
+    }
+
+    inline bool hasCustomKnob() { return falconknob::hasCustomKnob && customKnobImage().isValid(); }
+
     // Deterministic pseudo-random for stateless animation layers
     inline float prand (int i, float salt = 1.0f)
     {
@@ -180,7 +192,7 @@ namespace falcon
             else         { const float dh = w / ir; dest = { 0.0f, (h - dh) * 0.5f, w, dh }; }
 
             g.drawImage (img, dest, juce::RectanglePlacement::fillDestination, false);
-            g.setColour (background.withAlpha (0.42f));
+            g.setColour (background.withAlpha (falconbg::overlayOpacity));
             g.fillRect (bounds);
         }
         else switch (spec.base)
@@ -414,6 +426,33 @@ public:
                            float sliderPos, float rotaryStartAngle, float rotaryEndAngle,
                            juce::Slider& slider) override
     {
+        if (falcon::hasCustomKnob())
+        {
+            auto& strip = falcon::customKnobImage();
+            const int numFrames = juce::jmax (1, falconknob::numFrames);
+            const bool isH = falconknob::isHorizontal;
+            const int frame = juce::jlimit (0, numFrames - 1,
+                (int) std::floor (sliderPos * (float) (numFrames - 1) + 0.5f));
+
+            const int fw = isH ? (strip.getWidth() / numFrames) : strip.getWidth();
+            const int fh = isH ? strip.getHeight() : (strip.getHeight() / numFrames);
+            const int sx = isH ? (frame * fw) : 0;
+            const int sy = isH ? 0 : (frame * fh);
+
+            auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (4.0f);
+            const float scale = juce::jmin (bounds.getWidth() / (float) fw, bounds.getHeight() / (float) fh);
+            const float dw = (float) fw * scale;
+            const float dh = (float) fh * scale;
+            const float dx = bounds.getCentreX() - dw * 0.5f;
+            const float dy = bounds.getCentreY() - dh * 0.5f;
+
+            g.drawImage (strip,
+                         juce::roundToInt (dx), juce::roundToInt (dy),
+                         juce::roundToInt (dw), juce::roundToInt (dh),
+                         sx, sy, fw, fh);
+            return;
+        }
+
         const auto& spec = falcon::knobSpec();
 
         auto bounds = juce::Rectangle<int> (x, y, width, height).toFloat().reduced (8.0f);

@@ -3,6 +3,7 @@
 namespace falconbgfx
 {
     static constexpr bool hasImage = false;
+    static constexpr float overlayOpacity = 0.42f;
     static const unsigned char imageData[1] = { 0 };
     static constexpr int imageDataSize = 0;
 }

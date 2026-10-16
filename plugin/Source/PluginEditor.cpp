@@ -1,6 +1,6 @@
 #include "PluginEditor.h"
 
-FalconEcho2026Editor::FalconEcho2026Editor (FalconEcho2026Processor& p)
+FalconEchoTestNew1Editor::FalconEchoTestNew1Editor (FalconEchoTestNew1Processor& p)
     : AudioProcessorEditor (p), processor (p)
 {
     setLookAndFeel (&lnf);
@@ -46,12 +46,12 @@ FalconEcho2026Editor::FalconEcho2026Editor (FalconEcho2026Processor& p)
     startTimerHz (30);
 }
 
-FalconEcho2026Editor::~FalconEcho2026Editor()
+FalconEchoTestNew1Editor::~FalconEchoTestNew1Editor()
 {
     setLookAndFeel (nullptr);
 }
 
-void FalconEcho2026Editor::setupKnob (juce::Slider& slider, const juce::String& paramID)
+void FalconEchoTestNew1Editor::setupKnob (juce::Slider& slider, const juce::String& paramID)
 {
     slider.setSliderStyle (juce::Slider::RotaryHorizontalVerticalDrag);
     slider.setTextBoxStyle (juce::Slider::TextBoxBelow, false, 82, 18);
@@ -60,7 +60,7 @@ void FalconEcho2026Editor::setupKnob (juce::Slider& slider, const juce::String& 
         std::make_unique<SliderAttachment> (processor.apvts, paramID, slider));
 }
 
-void FalconEcho2026Editor::paint (juce::Graphics& g)
+void FalconEchoTestNew1Editor::paint (juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
 
@@ -80,7 +80,7 @@ void FalconEcho2026Editor::paint (juce::Graphics& g)
     // Title + brand (two-tone split of the product name)
     juce::Font titleFont (juce::FontOptions (26.0f, juce::Font::bold));
     g.setFont (titleFont);
-    const juce::String titleLeft ("FALCON"), titleRight ("ECHO 2026");
+    const juce::String titleLeft ("FALCON"), titleRight ("ECHO TEST NEW 1");
     const int titleLeftW = juce::roundToInt (
         juce::GlyphArrangement::getStringWidth (titleFont, titleLeft));
     g.setColour (falcon::titleLeft);
@@ -129,7 +129,7 @@ void FalconEcho2026Editor::paint (juce::Graphics& g)
     g.drawText ("v1.0.0", 24, getHeight() - 24, 60, 14, juce::Justification::centredLeft);
 }
 
-void FalconEcho2026Editor::resized()
+void FalconEchoTestNew1Editor::resized()
 {
     const int knobY = 100;
     const int knobH = 150;
@@ -159,7 +159,7 @@ void FalconEcho2026Editor::resized()
         activation->setBounds (getLocalBounds());
 }
 
-void FalconEcho2026Editor::timerCallback()
+void FalconEchoTestNew1Editor::timerCallback()
 {
     // Pull peaks from the audio thread, apply GUI-side decay
     const float newL = processor.peakL.exchange (0.0f);

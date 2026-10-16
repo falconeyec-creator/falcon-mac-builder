@@ -19,7 +19,7 @@ static const juce::StringArray divisionNames {
     "1/8 D", "1/8", "1/8 T", "1/16 D", "1/16", "1/16 T", "1/32"
 };
 
-double FalconEcho2026Processor::divisionToBeats (int i)
+double FalconEchoTestNew1Processor::divisionToBeats (int i)
 {
     // Beats (quarter notes) per division. D = dotted (1.5x), T = triplet (2/3x).
     static const double beats[] = {
@@ -41,7 +41,7 @@ double FalconEcho2026Processor::divisionToBeats (int i)
     return beats[juce::jlimit (0, (int) std::size (beats) - 1, i)];
 }
 
-juce::AudioProcessorValueTreeState::ParameterLayout FalconEcho2026Processor::createParameterLayout()
+juce::AudioProcessorValueTreeState::ParameterLayout FalconEchoTestNew1Processor::createParameterLayout()
 {
     using P = juce::AudioProcessorValueTreeState;
     P::ParameterLayout layout;
@@ -86,7 +86,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout FalconEcho2026Processor::cre
     return layout;
 }
 
-FalconEcho2026Processor::FalconEcho2026Processor()
+FalconEchoTestNew1Processor::FalconEchoTestNew1Processor()
     : AudioProcessor (BusesProperties()
                           .withInput ("Input", juce::AudioChannelSet::stereo(), true)
                           .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
@@ -96,13 +96,13 @@ FalconEcho2026Processor::FalconEcho2026Processor()
     licensed.store (FALCON_LICENSE_DISABLED != 0 || licenses.isActivated());
 }
 
-bool FalconEcho2026Processor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool FalconEchoTestNew1Processor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     return layouts.getMainInputChannelSet() == juce::AudioChannelSet::stereo()
         && layouts.getMainOutputChannelSet() == juce::AudioChannelSet::stereo();
 }
 
-void FalconEcho2026Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void FalconEchoTestNew1Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     sampleRateHz = sampleRate;
 
@@ -137,7 +137,7 @@ void FalconEcho2026Processor::prepareToPlay (double sampleRate, int samplesPerBl
     outGainSm.reset (sampleRate, 0.02);
 }
 
-void FalconEcho2026Processor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void FalconEchoTestNew1Processor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -232,26 +232,26 @@ void FalconEcho2026Processor::processBlock (juce::AudioBuffer<float>& buffer, ju
     if (blockPeakR > peakR.load()) peakR.store (blockPeakR);
 }
 
-void FalconEcho2026Processor::getStateInformation (juce::MemoryBlock& destData)
+void FalconEchoTestNew1Processor::getStateInformation (juce::MemoryBlock& destData)
 {
     if (auto xml = apvts.copyState().createXml())
         copyXmlToBinary (*xml, destData);
 }
 
-void FalconEcho2026Processor::setStateInformation (const void* data, int sizeInBytes)
+void FalconEchoTestNew1Processor::setStateInformation (const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary (data, sizeInBytes))
         if (xml->hasTagName (apvts.state.getType()))
             apvts.replaceState (juce::ValueTree::fromXml (*xml));
 }
 
-juce::AudioProcessorEditor* FalconEcho2026Processor::createEditor()
+juce::AudioProcessorEditor* FalconEchoTestNew1Processor::createEditor()
 {
-    return new FalconEcho2026Editor (*this);
+    return new FalconEchoTestNew1Editor (*this);
 }
 
 // This creates the plugin instance for the host
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new FalconEcho2026Processor();
+    return new FalconEchoTestNew1Processor();
 }
