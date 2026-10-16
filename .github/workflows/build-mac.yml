@@ -90,23 +90,34 @@ jobs:
             cp -R "$AU_PATH" "pkgroot/Library/Audio/Plug-Ins/Components/"
           fi
 
-          if [ -n "$AAX_PATH" ]; then
-            mkdir -p "pkgroot/Library/Application Support/Avid/Audio/Plug-Ins"
-            cp -R "$AAX_PATH" "pkgroot/Library/Application Support/Avid/Audio/Plug-Ins/"
-          fi
-
           if [ -n "$APP_PATH" ]; then
             mkdir -p "pkgroot/Applications"
             cp -R "$APP_PATH" "pkgroot/Applications/"
           fi
+
+          # Prepare postinstall script to strip quarantine and force AudioComponentRegistrar reload for Logic Pro
+          mkdir -p pkgscripts
+          cat << 'EOF' > pkgscripts/postinstall
+#!/bin/bash
+set -e
+# Strip quarantine attributes from audio plugins
+xattr -cr "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
+xattr -cr "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
+
+# Force macOS AudioComponentRegistrar to immediately register newly installed AU plugins for Logic Pro
+killall -9 AudioComponentRegistrar 2>/dev/null || true
+exit 0
+EOF
+          chmod +x pkgscripts/postinstall
 
           # Generate component plist and disable bundle relocation
           # (Prevents Spotlight bundle search failures during installation)
           pkgbuild --analyze --root pkgroot component.plist
           sed -i '' 's/<true\/>/<false\/>/g' component.plist || true
 
-          # Build atomic component package with clean identifier and no relocation
+          # Build atomic component package with clean identifier, postinstall script, and no relocation
           pkgbuild --root pkgroot \
+            --scripts pkgscripts \
             --component-plist component.plist \
             --identifier "$PKG_ID" \
             --version 1.0.0 \
