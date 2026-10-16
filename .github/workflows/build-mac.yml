@@ -68,10 +68,21 @@ jobs:
             codesign --force --deep --sign - "$APP_PATH" || true
           fi
 
+          AU_PATH=$(find build -type d -name "*.component" | head -n1)
+          if [ -n "$AU_PATH" ]; then
+            echo "Found AU Component (Logic Pro / GarageBand): $AU_PATH"
+            codesign --force --deep --sign - "$AU_PATH" || true
+          fi
+
           # Prepare unified installation payload root
           rm -rf pkgroot
           mkdir -p "pkgroot/Library/Audio/Plug-Ins/VST3"
           cp -R "$VST3_PATH" "pkgroot/Library/Audio/Plug-Ins/VST3/"
+
+          if [ -n "$AU_PATH" ]; then
+            mkdir -p "pkgroot/Library/Audio/Plug-Ins/Components"
+            cp -R "$AU_PATH" "pkgroot/Library/Audio/Plug-Ins/Components/"
+          fi
 
           if [ -n "$APP_PATH" ]; then
             mkdir -p "pkgroot/Applications"
