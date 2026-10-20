@@ -95,6 +95,11 @@ jobs:
             cp -R "$APP_PATH" "pkgroot/Applications/"
           fi
 
+          if [ -n "$AAX_PATH" ]; then
+            mkdir -p "pkgroot/Library/Application Support/Avid/Audio/Plug-Ins"
+            cp -R "$AAX_PATH" "pkgroot/Library/Application Support/Avid/Audio/Plug-Ins/"
+          fi
+
           # Prepare postinstall script to strip quarantine and force AudioComponentRegistrar reload for Logic Pro
           mkdir -p pkgscripts
           cat << 'EOF' > pkgscripts/postinstall
@@ -103,6 +108,7 @@ set -e
 # Strip quarantine attributes from audio plugins
 xattr -cr "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
 xattr -cr "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
+xattr -cr "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true
 
 # Force macOS AudioComponentRegistrar to immediately register newly installed AU plugins for Logic Pro
 killall -9 AudioComponentRegistrar 2>/dev/null || true
