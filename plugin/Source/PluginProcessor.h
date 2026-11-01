@@ -4,11 +4,11 @@
 #include <juce_dsp/juce_dsp.h>
 #include "FalconLicense.h"
 
-class FalconEchoTestNew1Processor : public juce::AudioProcessor
+class FalconEchoProcessor : public juce::AudioProcessor
 {
 public:
-    FalconEchoTestNew1Processor();
-    ~FalconEchoTestNew1Processor() override = default;
+    FalconEchoProcessor();
+    ~FalconEchoProcessor() override = default;
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
@@ -18,7 +18,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
-    const juce::String getName() const override { return "Falcon Echo Test New 1"; }
+    const juce::String getName() const override { return "Falcon Echo"; }
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
     double getTailLengthSeconds() const override { return 10.0; }
@@ -58,5 +58,5 @@ private:
 
     double sampleRateHz = 48000.0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FalconEchoTestNew1Processor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FalconEchoProcessor)
 };

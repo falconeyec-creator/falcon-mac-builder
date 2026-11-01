@@ -16,8 +16,8 @@ namespace falcon
 {
     // Falcon Eye Corporation palette
     const juce::Colour background   { 0xff10141c };
-    const juce::Colour panel        { 0xff161a22 };
-    const juce::Colour panelLight   { 0xff1e222a };
+    const juce::Colour panel        { 0xff161c26 };
+    const juce::Colour panelLight   { 0xff1e2632 };
     const juce::Colour accent       { 0xffffb13b };
     const juce::Colour accentHot    { 0xffff7847 };
     const juce::Colour textBright   { 0xffe8ecf4 };
@@ -27,7 +27,7 @@ namespace falcon
     // can offer dedicated "Title left"/"Title right" pickers.
     const juce::Colour titleLeft    { 0xffe8ecf4 };
     const juce::Colour titleRight   { 0xffffb13b };
-    const juce::Colour trackDark    { 0xff23272f };
+    const juce::Colour trackDark    { 0xff232b38 };
 
     //==========================================================================
     //  KNOB STYLE ENGINE — every knob is described by a spec; 30 curated
