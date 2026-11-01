@@ -29,10 +29,19 @@ jobs:
         run: |
           git clone --depth 1 --branch 8.0.14 https://github.com/juce-framework/JUCE.git JUCE-checkout
 
+      - name: Setup Avid AAX SDK
+        run: |
+          echo "=== Setting up Avid AAX SDK ==="
+          mkdir -p "${{ github.workspace }}/SDKs"
+          curl -sL "https://github.com/falconeyec-creator/falcon-mac-builder/releases/download/pace-tools/aax-sdk-2-10-0.zip" -o /tmp/aax_sdk.zip
+          unzip -q /tmp/aax_sdk.zip -d "${{ github.workspace }}/SDKs"
+          rm -f /tmp/aax_sdk.zip
+
       - name: Configure CMake
         run: |
           cmake -S plugin -B build -G Xcode \
             -DJUCE_DIR="${{ github.workspace }}/JUCE-checkout" \
+            -DJUCE_GLOBAL_AAX_SDK_PATH="${{ github.workspace }}/SDKs/aax-sdk-2-10-0" \
             -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
             -DCMAKE_OSX_DEPLOYMENT_TARGET="11.0"
 
