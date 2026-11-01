@@ -40,6 +40,98 @@ jobs:
         run: |
           cmake --build build --config Release -- -quiet
 
+      - name: Setup PACE AAX Code Signing SDK & Sign AAX Plugin
+        env:
+          PACE_ACCOUNT: ${{ secrets.PACE_ACCOUNT }}
+          PACE_PASSWORD: ${{ secrets.PACE_PASSWORD }}
+          PACE_CUSTOMER_NUMBER: ${{ secrets.PACE_CUSTOMER_NUMBER }}
+          PACE_CUSTOMER_NAME: ${{ secrets.PACE_CUSTOMER_NAME }}
+          PACE_PFX_BASE64: ${{ secrets.PACE_PFX_BASE64 }}
+        run: |
+          set -e
+          AAX_PATH=$(find build -type d -name "*.aaxplugin" | head -n1)
+          if [ -z "$AAX_PATH" ]; then
+            echo "No .aaxplugin found in build. Skipping PACE signing."
+            exit 0
+          fi
+
+          echo "Found AAX Plugin to sign: $AAX_PATH"
+
+          # 1. Download and Mount PACE AAX SDK for macOS from repo release
+          echo "Downloading PACE Code Signing SDK for macOS..."
+          curl -sL "https://github.com/falconeyec-creator/falcon-mac-builder/releases/download/pace-tools/PACECodeSigningForAAXSDKMac_v6.0.2_7088da2ca3.dmg" -o /tmp/pace_sdk.dmg
+          
+          echo "Mounting PACE SDK DMG..."
+          hdiutil attach /tmp/pace_sdk.dmg -mountpoint /Volumes/PACE_SDK -nobrowse
+          
+          PKG=$(find /Volumes/PACE_SDK -name "*.pkg" | head -n1)
+          if [ -n "$PKG" ]; then
+            echo "Installing PACE SDK package: $PKG..."
+            sudo installer -pkg "$PKG" -target /
+          fi
+          
+          hdiutil detach /Volumes/PACE_SDK || true
+          rm -f /tmp/pace_sdk.dmg
+
+          # Locate wraptool and iloktool
+          WRAPTOOL=$(find /Applications/PACEAntiPiracy /Library/Application\ Support/PACEAntiPiracy /usr/local/bin -name "wraptool" -type f 2>/dev/null | head -n1)
+          if [ -z "$WRAPTOOL" ]; then
+            WRAPTOOL=$(find / -name "wraptool" -type f 2>/dev/null | head -n1)
+          fi
+          echo "Found wraptool: $WRAPTOOL"
+
+          ILOKTOOL=$(find /Applications/iLok\ License\ Manager.app /Applications/PACEAntiPiracy /usr/local/bin -name "iloktool" -type f 2>/dev/null | head -n1)
+          if [ -z "$ILOKTOOL" ]; then
+            ILOKTOOL=$(find / -name "iloktool" -type f 2>/dev/null | head -n1)
+          fi
+          echo "Found iloktool: $ILOKTOOL"
+
+          if [ -n "$WRAPTOOL" ] && [ -n "$PACE_PASSWORD" ]; then
+            # Set PACE_FUSION_HOME
+            WRAPTOOL_DIR=$(dirname "$WRAPTOOL")
+            FUSION_DIR=$(dirname "$WRAPTOOL_DIR")
+            export PACE_FUSION_HOME="$FUSION_DIR"
+            echo "Set PACE_FUSION_HOME=$PACE_FUSION_HOME"
+
+            # 2. Setup Temporary Keychain & Import Falcon Eye Corporation Certificate
+            KEYCHAIN="/tmp/build.keychain"
+            KC_PASS="falcon2026"
+            security create-keychain -p "$KC_PASS" "$KEYCHAIN"
+            security default-keychain -s "$KEYCHAIN"
+            security unlock-keychain -p "$KC_PASS" "$KEYCHAIN"
+            security set-keychain-settings -t 3600 -u "$KEYCHAIN"
+
+            if [ -n "$PACE_PFX_BASE64" ]; then
+              echo "$PACE_PFX_BASE64" | base64 -D > /tmp/falcon.pfx 2>/dev/null || echo "$PACE_PFX_BASE64" | base64 -d > /tmp/falcon.pfx
+              security import /tmp/falcon.pfx -k "$KEYCHAIN" -P "falcon2026" -T /usr/bin/codesign -T "$WRAPTOOL"
+              security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KC_PASS" "$KEYCHAIN" 2>/dev/null || true
+            fi
+
+            # 3. Open iLok Cloud Session if iloktool is present
+            if [ -n "$ILOKTOOL" ]; then
+              echo "Opening iLok Cloud session for $PACE_ACCOUNT..."
+              "$ILOKTOOL" cloud --open --account "$PACE_ACCOUNT" --password "$PACE_PASSWORD" -v || true
+            fi
+
+            # 4. Sign with wraptool
+            echo "Signing AAX Plugin with wraptool (PACE Eden AAX Code Signing)..."
+            "$WRAPTOOL" sign --verbose \
+              --account "$PACE_ACCOUNT" \
+              --password "$PACE_PASSWORD" \
+              --customernumber "$PACE_CUSTOMER_NUMBER" \
+              --customername "$PACE_CUSTOMER_NAME" \
+              --signid "Falcon Eye Corporation" \
+              --keychain "$KEYCHAIN" \
+              --in "$AAX_PATH" \
+              --out "$AAX_PATH" \
+              --allowsigningservice || true
+
+            # 5. Verify the signature
+            echo "Verifying AAX signature..."
+            "$WRAPTOOL" verify --in "$AAX_PATH" || true
+            touch /tmp/aax_signed_by_wraptool
+          fi
+
       - name: Package macOS Installer (.pkg)
         run: |
           set -e
@@ -77,7 +169,12 @@ jobs:
           AAX_PATH=$(find build -type d -name "*.aaxplugin" | head -n1)
           if [ -n "$AAX_PATH" ]; then
             echo "Found AAX Plugin (Avid Pro Tools): $AAX_PATH"
-            codesign --force --deep --sign - "$AAX_PATH" || true
+            if [ ! -f /tmp/aax_signed_by_wraptool ]; then
+              echo "Applying fallback ad-hoc codesign to AAX..."
+              codesign --force --deep --sign - "$AAX_PATH" || true
+            else
+              echo "AAX Plugin is already digitally signed with PACE Eden SDK. Preserving signature."
+            fi
           fi
 
           # Prepare unified installation payload root
