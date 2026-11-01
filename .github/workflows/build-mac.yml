@@ -37,6 +37,41 @@ jobs:
           unzip -q /tmp/aax_sdk.zip -d "${{ github.workspace }}/SDKs"
           rm -f /tmp/aax_sdk.zip
 
+      - name: Normalize Plugin CMakeLists for macOS
+        run: |
+          python3 -c '
+          import re, os
+          cmake_file = "plugin/CMakeLists.txt"
+          if os.path.exists(cmake_file):
+              with open(cmake_file, "r", encoding="utf-8", errors="ignore") as f:
+                  content = f.read()
+
+              # Replace hardcoded Windows JUCE subdirectory paths with ${JUCE_DIR}
+              content = re.sub(
+                  r"add_subdirectory\s*\(\s*[\"\x27][^\"\x27]*JUCE[^\"\x27]*[\"\x27][^\)]*\)",
+                  "if (DEFINED JUCE_DIR)\n    add_subdirectory(${JUCE_DIR} ${CMAKE_BINARY_DIR}/JUCE)\nendif()",
+                  content,
+                  flags=re.IGNORECASE
+              )
+
+              # Ensure FORMATS includes AU and AAX for Mac
+              if "FORMATS" in content:
+                  formats_match = re.search(r"FORMATS\s+([^\)\n]+)", content)
+                  if formats_match:
+                      raw_fmts = formats_match.group(1).split()
+                      fmts = set(raw_fmts)
+                      fmts.update(["VST3", "AU", "AAX", "Standalone"])
+                      new_fmts = "FORMATS " + " ".join(sorted(fmts))
+                      content = content.replace(formats_match.group(0), new_fmts)
+
+              if "AU_SANDBOX_SAFE" not in content and "juce_add_plugin" in content:
+                  content = re.sub(r"(juce_add_plugin\s*\([^\n]*)", r"\1\n    AU_SANDBOX_SAFE TRUE", content)
+
+              with open(cmake_file, "w", encoding="utf-8") as f:
+                  f.write(content)
+              print("=== Normalized CMakeLists.txt for macOS ===")
+          '
+
       - name: Configure CMake
         run: |
           cmake -S plugin -B build -G Xcode \
