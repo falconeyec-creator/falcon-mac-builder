@@ -132,13 +132,17 @@ EOF
 
           # Build final macOS product installer
           productbuild --package component.pkg "out/${PROJECT} Setup.pkg"
+
+          if [ -n "$AAX_PATH" ]; then
+            zip -r "out/${PROJECT}_Mac.aaxplugin.zip" "$AAX_PATH"
+          fi
           ls -la out
 
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@v4
         with:
           name: mac-installer
-          path: out/*.pkg
+          path: out/*
           if-no-files-found: error
 
       - name: Publish Release Asset
@@ -147,6 +151,6 @@ EOF
         with:
           tag_name: latest
           name: "Latest macOS VST Installer"
-          files: out/*.pkg
+          files: out/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
