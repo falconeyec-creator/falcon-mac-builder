@@ -118,6 +118,10 @@ jobs:
           hdiutil detach /Volumes/PACE_SDK || true
           rm -f /tmp/pace_sdk.dmg
 
+          # 1b. Install iLok License Support (iloktool & license daemon)
+          echo "Installing iLok License Support for macOS..."
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask ilok-license-manager || true
+
           # Locate wraptool and iloktool
           WRAPTOOL=$(find /Applications/PACEAntiPiracy /Library/Application\ Support/PACEAntiPiracy /usr/local/bin -name "wraptool" -type f 2>/dev/null | head -n1)
           if [ -z "$WRAPTOOL" ]; then
@@ -210,6 +214,11 @@ jobs:
               touch /tmp/aax_signed_by_wraptool
             else
               echo "WARNING: PACE Eden signature verification did not pass."
+            fi
+
+            if [ -n "$ILOKTOOL" ]; then
+              echo "Closing iLok Cloud session..."
+              "$ILOKTOOL" cloud --close -v || true
             fi
           fi
 
