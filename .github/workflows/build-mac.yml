@@ -88,6 +88,7 @@ jobs:
         env:
           PACE_ACCOUNT: ${{ secrets.PACE_ACCOUNT }}
           PACE_PASSWORD: ${{ secrets.PACE_PASSWORD }}
+          PACE_WCGUID: ${{ secrets.PACE_WCGUID }}
           PACE_CUSTOMER_NUMBER: ${{ secrets.PACE_CUSTOMER_NUMBER }}
           PACE_CUSTOMER_NAME: ${{ secrets.PACE_CUSTOMER_NAME }}
           PACE_PFX_BASE64: ${{ secrets.PACE_PFX_BASE64 }}
@@ -157,23 +158,59 @@ jobs:
               "$ILOKTOOL" cloud --open --account "$PACE_ACCOUNT" --password "$PACE_PASSWORD" -v || true
             fi
 
-            # 4. Sign with wraptool
+            # 4. Sign with wraptool using PACE WCGUID
             echo "Signing AAX Plugin with wraptool (PACE Eden AAX Code Signing)..."
-            "$WRAPTOOL" sign --verbose \
-              --account "$PACE_ACCOUNT" \
-              --password "$PACE_PASSWORD" \
-              --customernumber "$PACE_CUSTOMER_NUMBER" \
-              --customername "$PACE_CUSTOMER_NAME" \
-              --signid "Falcon Eye Corporation" \
-              --keychain "$KEYCHAIN" \
-              --in "$AAX_PATH" \
-              --out "$AAX_PATH" \
-              --allowsigningservice || true
+            echo "Wrap Configuration GUID: $PACE_WCGUID"
+
+            SIGN_SUCCESS=false
+            if [ -n "$PACE_WCGUID" ]; then
+              echo "Attempting wraptool sign with WCGUID and signid..."
+              if "$WRAPTOOL" sign --verbose \
+                --account "$PACE_ACCOUNT" \
+                --password "$PACE_PASSWORD" \
+                --wcguid "$PACE_WCGUID" \
+                --signid "Falcon Eye Corporation" \
+                --keychain "$KEYCHAIN" \
+                --in "$AAX_PATH" \
+                --out "$AAX_PATH" \
+                --allowsigningservice; then
+                SIGN_SUCCESS=true
+              else
+                echo "Retrying wraptool sign with WCGUID (omitting signid)..."
+                if "$WRAPTOOL" sign --verbose \
+                  --account "$PACE_ACCOUNT" \
+                  --password "$PACE_PASSWORD" \
+                  --wcguid "$PACE_WCGUID" \
+                  --in "$AAX_PATH" \
+                  --out "$AAX_PATH" \
+                  --allowsigningservice; then
+                  SIGN_SUCCESS=true
+                fi
+              fi
+            fi
+
+            if [ "$SIGN_SUCCESS" != "true" ] && [ -n "$PACE_CUSTOMER_NUMBER" ]; then
+              echo "Fallback: Attempting wraptool sign with customernumber..."
+              "$WRAPTOOL" sign --verbose \
+                --account "$PACE_ACCOUNT" \
+                --password "$PACE_PASSWORD" \
+                --customernumber "$PACE_CUSTOMER_NUMBER" \
+                --customername "$PACE_CUSTOMER_NAME" \
+                --signid "Falcon Eye Corporation" \
+                --keychain "$KEYCHAIN" \
+                --in "$AAX_PATH" \
+                --out "$AAX_PATH" \
+                --allowsigningservice || true
+            fi
 
             # 5. Verify the signature
             echo "Verifying AAX signature..."
-            "$WRAPTOOL" verify --in "$AAX_PATH" || true
-            touch /tmp/aax_signed_by_wraptool
+            if "$WRAPTOOL" verify --in "$AAX_PATH"; then
+              echo "SUCCESS: Official PACE Eden AAX Signature Verified!"
+              touch /tmp/aax_signed_by_wraptool
+            else
+              echo "WARNING: PACE Eden signature verification did not pass."
+            fi
           fi
 
       - name: Package macOS Installer (.pkg)
