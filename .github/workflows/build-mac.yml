@@ -168,7 +168,7 @@ jobs:
 
             SIGN_SUCCESS=false
             if [ -n "$PACE_WCGUID" ]; then
-              echo "Attempting wraptool sign with WCGUID and signid..."
+              echo "1. Attempting exact PACE Central wraptool sign command with autoinstall on..."
               if "$WRAPTOOL" sign --verbose \
                 --account "$PACE_ACCOUNT" \
                 --password "$PACE_PASSWORD" \
@@ -177,19 +177,27 @@ jobs:
                 --keychain "$KEYCHAIN" \
                 --in "$AAX_PATH" \
                 --out "$AAX_PATH" \
-                --allowsigningservice; then
+                --autoinstall on; then
                 SIGN_SUCCESS=true
-              else
-                echo "Retrying wraptool sign with WCGUID (omitting signid)..."
-                if "$WRAPTOOL" sign --verbose \
-                  --account "$PACE_ACCOUNT" \
-                  --password "$PACE_PASSWORD" \
-                  --wcguid "$PACE_WCGUID" \
-                  --in "$AAX_PATH" \
-                  --out "$AAX_PATH" \
-                  --allowsigningservice; then
-                  SIGN_SUCCESS=true
-                fi
+              elif "$WRAPTOOL" sign --verbose \
+                --account "$PACE_ACCOUNT" \
+                --password "$PACE_PASSWORD" \
+                --wcguid "$PACE_WCGUID" \
+                --signid "Falcon Eye Corporation" \
+                --keychain "$KEYCHAIN" \
+                --in "$AAX_PATH" \
+                --out "$AAX_PATH" \
+                --allowsigningservice \
+                --autoinstall on; then
+                SIGN_SUCCESS=true
+              elif "$WRAPTOOL" sign --verbose \
+                --account "$PACE_ACCOUNT" \
+                --password "$PACE_PASSWORD" \
+                --wcguid "$PACE_WCGUID" \
+                --in "$AAX_PATH" \
+                --out "$AAX_PATH" \
+                --autoinstall on; then
+                SIGN_SUCCESS=true
               fi
             fi
 
