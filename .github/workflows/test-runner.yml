@@ -1,7 +1,7 @@
 name: Test Runner
 on: workflow_dispatch
 jobs:
-  test-linux:
-    runs-on: ubuntu-latest
+  test-macos-14:
+    runs-on: macos-14
     steps:
-      - run: echo "Hello from Linux runner!"
+      - run: echo "Hello from macos-14!"
