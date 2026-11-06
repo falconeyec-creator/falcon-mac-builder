@@ -297,36 +297,13 @@ jobs:
 
           # Prepare postinstall script to strip quarantine, set permissions, and force AudioComponentRegistrar reload for Logic Pro
           mkdir -p pkgscripts
-          cat << 'EOF' > pkgscripts/postinstall
-#!/bin/bash
-set -e
-chmod -R 755 "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
-chmod -R 755 "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
-chmod -R 755 "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true
-
-xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
-xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
-xattr -dr com.apple.quarantine "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true
-
-killall -9 AudioComponentRegistrar 2>/dev/null || true
-exit 0
-EOF
+          printf '#!/bin/bash\nset -e\nchmod -R 755 "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true\nchmod -R 755 "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true\nchmod -R 755 "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true\nxattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true\nxattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true\nxattr -dr com.apple.quarantine "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true\nkillall -9 AudioComponentRegistrar 2>/dev/null || true\nexit 0\n' > pkgscripts/postinstall
           chmod +x pkgscripts/postinstall
 
           # Generate component plist and disable bundle relocation
           # (Prevents Spotlight relocation while GUARANTEEING BundleIsInstalled remains true)
           pkgbuild --analyze --root pkgroot component.plist
-          python3 -c '
-import plistlib
-with open("component.plist", "rb") as f:
-    pl = plistlib.load(f)
-for comp in pl:
-    comp["BundleIsRelocatable"] = False
-    comp["BundleIsInstalled"] = True
-with open("component.plist", "wb") as f:
-    plistlib.dump(pl, f)
-print("Updated component.plist with BundleIsInstalled=True")
-'
+          python3 -c "import plistlib; pl = plistlib.load(open('component.plist', 'rb')); [comp.update({'BundleIsRelocatable': False, 'BundleIsInstalled': True}) for comp in pl]; plistlib.dump(pl, open('component.plist', 'wb'))"
 
           # Build atomic component package with clean identifier, postinstall script, and no relocation
           pkgbuild --root pkgroot \
