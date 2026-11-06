@@ -325,9 +325,7 @@ for comp in pl:
     comp["BundleIsInstalled"] = True
 with open("component.plist", "wb") as f:
     plistlib.dump(pl, f)
-print("=== Verified component.plist ===")
-for comp in pl:
-    print(f"Bundle: {comp.get(\x27RootRelativeBundlePath\x27)} | Installed: {comp.get(\x27BundleIsInstalled\x27)} | Relocatable: {comp.get(\x27BundleIsRelocatable\x27)}")
+print("Updated component.plist with BundleIsInstalled=True")
 '
 
           # Build atomic component package with clean identifier, postinstall script, and no relocation
