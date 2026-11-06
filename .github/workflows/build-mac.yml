@@ -295,15 +295,40 @@ jobs:
             cp -R "$AAX_PATH" "pkgroot/Library/Application Support/Avid/Audio/Plug-Ins/"
           fi
 
-          # Prepare postinstall script to strip quarantine and force AudioComponentRegistrar reload for Logic Pro
+          # Prepare postinstall script to strip quarantine, set permissions, and force AudioComponentRegistrar reload for Logic Pro
           mkdir -p pkgscripts
-          printf '#!/bin/bash\nset -e\nxattr -cr "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true\nxattr -cr "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true\nxattr -cr "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true\nkillall -9 AudioComponentRegistrar 2>/dev/null || true\nexit 0\n' > pkgscripts/postinstall
+          cat << 'EOF' > pkgscripts/postinstall
+#!/bin/bash
+set -e
+chmod -R 755 "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
+chmod -R 755 "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
+chmod -R 755 "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true
+
+xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components" 2>/dev/null || true
+xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/VST3" 2>/dev/null || true
+xattr -dr com.apple.quarantine "/Library/Application Support/Avid/Audio/Plug-Ins" 2>/dev/null || true
+
+killall -9 AudioComponentRegistrar 2>/dev/null || true
+exit 0
+EOF
           chmod +x pkgscripts/postinstall
 
           # Generate component plist and disable bundle relocation
-          # (Prevents Spotlight bundle search failures during installation)
+          # (Prevents Spotlight relocation while GUARANTEEING BundleIsInstalled remains true)
           pkgbuild --analyze --root pkgroot component.plist
-          sed -i '' 's/<true\/>/<false\/>/g' component.plist || true
+          python3 -c '
+import plistlib
+with open("component.plist", "rb") as f:
+    pl = plistlib.load(f)
+for comp in pl:
+    comp["BundleIsRelocatable"] = False
+    comp["BundleIsInstalled"] = True
+with open("component.plist", "wb") as f:
+    plistlib.dump(pl, f)
+print("=== Verified component.plist ===")
+for comp in pl:
+    print(f"Bundle: {comp.get(\x27RootRelativeBundlePath\x27)} | Installed: {comp.get(\x27BundleIsInstalled\x27)} | Relocatable: {comp.get(\x27BundleIsRelocatable\x27)}")
+'
 
           # Build atomic component package with clean identifier, postinstall script, and no relocation
           pkgbuild --root pkgroot \
